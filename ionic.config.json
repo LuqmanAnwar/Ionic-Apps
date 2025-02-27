@@ -1,0 +1,8 @@
+{
+  "name": "KPDN_APPS",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react-vite",
+  "id": "71d2fa87"
+}
