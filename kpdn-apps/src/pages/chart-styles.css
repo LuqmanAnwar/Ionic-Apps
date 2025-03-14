@@ -1,0 +1,72 @@
+/* Add these styles to your existing styles.css file */
+
+.chart-card {
+    --background: var(--card-background);
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+    border: var(--card-border);
+    margin-bottom: 20px;
+    overflow: hidden;
+    position: relative;
+  }
+  
+  .chart-title {
+    color: var(--text-primary);
+    font-size: 1.2rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+  }
+  
+  .chart-icon {
+    margin-right: 8px;
+    color: var(--accent-color);
+  }
+  
+  .chart-content {
+    padding: 0 0px 16px 0;
+  }
+  
+  .pie-chart-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .transactions-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .transactions-title {
+    color: var(--text-primary);
+    font-size: 1.2rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+  }
+  
+  .transactions-icon {
+    margin-right: 8px;
+    color: var(--accent-color);
+  }
+  
+  .export-button {
+    --background: rgba(0, 114, 255, 0.1);
+    --color: var(--accent-color);
+    --border-radius: 8px;
+    --border-color: rgba(0, 114, 255, 0.3);
+    --border-style: solid;
+    --border-width: 1px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    height: 36px;
+  }
+  
+  .export-button:hover {
+    --background: rgba(0, 114, 255, 0.2);
+    --color: var(--accent-color);
+  }
+  
+  

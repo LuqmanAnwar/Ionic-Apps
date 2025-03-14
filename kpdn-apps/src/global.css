@@ -1,0 +1,73 @@
+/* Custom styles for the vehicle search and details pages */
+
+.data-item,
+.detail-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.data-item .label,
+.detail-item .label {
+  font-size: 14px;
+  color: #92949c;
+  margin-bottom: 4px;
+}
+
+.data-item .value,
+.detail-item .value {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* Risk level indicators */
+.risk-high {
+  color: #eb445a;
+}
+
+.risk-medium {
+  color: #ffc409;
+}
+
+.risk-low {
+  color: #2dd36f;
+}
+
+/* Card hover effects */
+ion-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+ion-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .data-item .value,
+  .detail-item .value {
+    font-size: 14px;
+  }
+
+  ion-card-title {
+    font-size: 18px !important;
+  }
+}
