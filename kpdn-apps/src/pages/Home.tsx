@@ -29,9 +29,12 @@ import {
   statsChartOutline,
   timeOutline,
   searchOutline,
+  locationOutline,
 } from "ionicons/icons"
 import { useHistory } from "react-router-dom"
 import "./Home.css"
+import "./map-styles.css"
+import StationMap from "./station-map"
 
 const Home: React.FC = () => {
   const history = useHistory()
@@ -63,9 +66,7 @@ const Home: React.FC = () => {
             <p className="hero-subtitle">
               Advanced analytics platform for monitoring and investigating diesel subsidy usage patterns
             </p>
-            <div className="hero-actions">
-
-            </div>
+            <div className="hero-actions"></div>
           </div>
           <div className="hero-overlay"></div>
         </div>
@@ -110,6 +111,15 @@ const Home: React.FC = () => {
           </IonGrid>
         </div>
 
+        {/* Petrol Station Map Section */}
+        <div className="station-map-section">
+          <h2 className="section-title">
+            <IonIcon icon={locationOutline} className="section-icon" />
+            Petrol Station Risk Map
+          </h2>
+          <StationMap />
+        </div>
+
         {/* Main Navigation Cards */}
         <div className="main-navigation">
           <h2 className="section-title">
@@ -120,60 +130,9 @@ const Home: React.FC = () => {
           <IonGrid>
             <IonRow>
               <IonCol size="12" sizeMd="6">
-                <IonCard className="navigation-card" onClick={() => history.push("/investigations")}>
-                  <div className="card-image-container">
-                    <img
-                      src="/assets/images/investigation.png"
-                      alt="Vehicle Investigation"
-                      className="card-image"
-                    />
-                    <div className="card-badge-container">
-                      <IonBadge color="danger" className="card-badge">
-                        {summaryData.highRiskVehicles} High Risk
-                      </IonBadge>
-                    </div>
-                  </div>
-                  <IonCardHeader>
-                    <IonCardTitle className="card-title">
-                      <IonIcon icon={carSportOutline} className="card-title-icon" />
-                      Diesel Vehicle Investigation
-                    </IonCardTitle>
-                  </IonCardHeader>
-                  <IonCardContent>
-                    <p className="card-description">
-                      Track and analyze suspicious vehicle activities, monitor fuel consumption patterns, and identify
-                      potential subsidy abuse cases.
-                    </p>
-                    <div className="card-features">
-                      <div className="feature">
-                        <IonIcon icon={analyticsOutline} className="feature-icon" />
-                        <span>Usage Analytics</span>
-                      </div>
-                      <div className="feature">
-                        <IonIcon icon={alertCircleOutline} className="feature-icon" />
-                        <span>Risk Detection</span>
-                      </div>
-                      <div className="feature">
-                        <IonIcon icon={timeOutline} className="feature-icon" />
-                        <span>Transaction History</span>
-                      </div>
-                    </div>
-                    <IonButton expand="block" className="card-button">
-                      View Vehicles
-                      <IonIcon slot="end" icon={arrowForwardOutline} />
-                    </IonButton>
-                  </IonCardContent>
-                </IonCard>
-              </IonCol>
-
-              <IonCol size="12" sizeMd="6">
                 <IonCard className="navigation-card" onClick={() => history.push("/petrol")}>
                   <div className="card-image-container">
-                    <img
-                      src="/assets/images/petrol.png"
-                      alt="Station Investigation"
-                      className="card-image"
-                    />
+                    <img src="/assets/images/petrol.png" alt="Station Investigation" className="card-image" />
                     <div className="card-badge-container">
                       <IonBadge color="warning" className="card-badge">
                         {summaryData.highRiskStations} High Risk
@@ -212,10 +171,52 @@ const Home: React.FC = () => {
                   </IonCardContent>
                 </IonCard>
               </IonCol>
+
+              <IonCol size="12" sizeMd="6">
+                <IonCard className="navigation-card" onClick={() => history.push("/investigations")}>
+                  <div className="card-image-container">
+                    <img src="/assets/images/investigation.png" alt="Vehicle Investigation" className="card-image" />
+                    <div className="card-badge-container">
+                      <IonBadge color="danger" className="card-badge">
+                        {summaryData.highRiskVehicles} High Risk
+                      </IonBadge>
+                    </div>
+                  </div>
+                  <IonCardHeader>
+                    <IonCardTitle className="card-title">
+                      <IonIcon icon={carSportOutline} className="card-title-icon" />
+                      Diesel Vehicle Investigation
+                    </IonCardTitle>
+                  </IonCardHeader>
+                  <IonCardContent>
+                    <p className="card-description">
+                      Track and analyze suspicious vehicle activities, monitor fuel consumption patterns, and identify
+                      potential subsidy abuse cases.
+                    </p>
+                    <div className="card-features">
+                      <div className="feature">
+                        <IonIcon icon={analyticsOutline} className="feature-icon" />
+                        <span>Usage Analytics</span>
+                      </div>
+                      <div className="feature">
+                        <IonIcon icon={alertCircleOutline} className="feature-icon" />
+                        <span>Risk Detection</span>
+                      </div>
+                      <div className="feature">
+                        <IonIcon icon={timeOutline} className="feature-icon" />
+                        <span>Transaction History</span>
+                      </div>
+                    </div>
+                    <IonButton expand="block" className="card-button">
+                      View Vehicles
+                      <IonIcon slot="end" icon={arrowForwardOutline} />
+                    </IonButton>
+                  </IonCardContent>
+                </IonCard>
+              </IonCol>
             </IonRow>
           </IonGrid>
         </div>
-
       </IonContent>
     </IonPage>
   )

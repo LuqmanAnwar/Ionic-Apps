@@ -23,7 +23,7 @@ const AppRoutes: React.FC = () => (
       <Route path="/red-flag" component={RedFlag} />
       <Route path="/investigations" component={VehicleSearch} />{" "}
       <Route path="/petrol" component={PetrolStationDashboard} />{" "}
-      <Route path="/statistic/:nama_lokasi_stesen_minyak1_id" component={StationStatistics} />
+      <Route path="/statistic/:station_id" component={StationStatistics} />
 
 
 

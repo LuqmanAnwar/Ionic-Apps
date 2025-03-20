@@ -67,30 +67,18 @@ interface Vehicle {
 interface PetrolStationData {
   address: string
   district: string
-  fmt_datetime: string
-  jenis_fleet_card1: string
-  kategori_kenderaan: string
-  kuota_guna_liter: number
-  kuota_lulus_liter: number
-  lat: number
-  lng: number
-  masa_transaksi: string
-  nama_lokasi_stesen_minyak: string
-  negeri: string
+  formatted_date: string
+  quota_approved: number
   no_subsidi: string
   no_pendaftaran_kenderaan: string
-  pemegang_akaun1: string
-  sektor_kenderaan1: string
-  state_2: string
+  state: string
   status: string
-  transaction_count_daily: number
-  nama_lokasi_stesen_minyak1: string
-  petrol_car_unique: number
-  all_petrol_transaction_count: number
+  station_name: string
   total_volume: number
   unique_vehicles: string
   transaction_count: number
-  nama_lokasi_stesen_minyak1_id: string
+  station_id: string
+  day_date: string
   vehicles: Vehicle[]
 }
 
@@ -98,16 +86,14 @@ interface TransactionData {
   id: string // Ensure this is a unique identifier
   no_pendaftaran_kenderaan: string
   kuota_guna_liter: number
-  fmt_datetime: string
+  formatted_date: string
   status: string
-  nama_lokasi_stesen_minyak1: string // Add this property
+  station_name: string // Add this property
 }
 
 const PetrolStationDashboard: React.FC = () => {
   const [searchText, setSearchText] = useState<string>("")
-  const [searchId, setSearchId] = useState<string>("")
-  const { nama_lokasi_stesen_minyak1_id } = useParams<{ nama_lokasi_stesen_minyak1_id: string }>()
-
+  const [searchId, station_id] = useState<string>("")
   const [selectedState, setSelectedState] = useState<string>("")
   const [startDate, setStartDate] = useState<string | null>(null)
   const [endDate, setEndDate] = useState<string | null>(null)
@@ -141,6 +127,7 @@ const PetrolStationDashboard: React.FC = () => {
 
   const history = useHistory()
 
+
   const formatDateForBackend = (dateString: string | null) => {
     if (!dateString) return null
     const date = new Date(dateString)
@@ -153,7 +140,7 @@ const PetrolStationDashboard: React.FC = () => {
       const requestBody = {
         state: selectedState,
         search: searchText,
-        searchid: searchId,
+        searchid: station_id,
         start_date: formatDateForBackend(startDate),
         end_date: formatDateForBackend(endDate),
       }
@@ -181,11 +168,11 @@ const PetrolStationDashboard: React.FC = () => {
     } finally {
       setIsLoading(false)
     }
-  }, [selectedState, searchText, startDate, endDate,searchId])
+  }, [selectedState, searchText, startDate, endDate, searchId])
 
   useEffect(() => {
     fetchData()
-  }, [fetchData, searchText,searchId])
+  }, [fetchData, searchText, searchId])
 
   const fetchTransactions = async (stationId: string) => {
     setIsLoadingTransactions(true)
@@ -195,7 +182,7 @@ const PetrolStationDashboard: React.FC = () => {
       const requestBody = {
         state: selectedState,
         search: searchText,
-        searchid:searchId,
+        searchid: station_id,
         start_date: formatDateForBackend(startDate),
         end_date: formatDateForBackend(endDate),
       }
@@ -229,10 +216,13 @@ const PetrolStationDashboard: React.FC = () => {
   }
 
   const handleViewTransactions = (station: PetrolStationData) => {
-    setSelectedStation(station.nama_lokasi_stesen_minyak1_id)
-    history.push(`/statistic/${station.nama_lokasi_stesen_minyak1_id}`)
-    setShowTransactions(true)
+    setSelectedStation(station.station_id);
+    // Use the day_date from the station data
+    const date = station.day_date; // Assuming this is the date you want to pass
+    history.push(`/statistic/${station.station_id}?date=${date}`); // Pass the day_date as a query parameter
+    setShowTransactions(true);
   }
+
 
   const clearDateFilters = () => {
     setStartDate(null)
@@ -260,14 +250,14 @@ const PetrolStationDashboard: React.FC = () => {
 
   const handleDateChange =
     (setDateFunc: React.Dispatch<React.SetStateAction<string | null>>, closePopover: () => void) =>
-    (e: CustomEvent) => {
-      const selectedDate = e.detail.value
-      if (typeof selectedDate === "string") {
-        console.log("Selected date:", selectedDate)
-        setDateFunc(selectedDate)
-        closePopover()
+      (e: CustomEvent) => {
+        const selectedDate = e.detail.value
+        if (typeof selectedDate === "string") {
+          console.log("Selected date:", selectedDate)
+          setDateFunc(selectedDate)
+          closePopover()
+        }
       }
-    }
 
   const handleSort = (field: string) => {
     if (sortBy === field) {
@@ -294,27 +284,27 @@ const PetrolStationDashboard: React.FC = () => {
         comparison = a.status.localeCompare(b.status)
         break
       case "last_activity":
-        comparison = new Date(a.fmt_datetime).getTime() - new Date(b.fmt_datetime).getTime()
+        comparison = new Date(a.formatted_date).getTime() - new Date(b.formatted_date).getTime()
         break
     }
     return sortOrder === "asc" ? comparison : -comparison
   })
 
   return (
-<IonPage className="futuristic-dashboard light-theme">
-  <IonHeader>
-    <IonToolbar className="header-toolbar">
-      <IonButtons slot="start">
-        <IonButton className="back-button" onClick={() => history.push("/")}>
-          <span className="back-text">Back</span>
-        </IonButton>
-      </IonButtons>
-      <IonTitle className="main-title">
-        <IonIcon icon={flashOutline} className="title-icon pulse-icon" />
-        PETROL STATION
-      </IonTitle>
-    </IonToolbar>
-  </IonHeader>
+    <IonPage className="futuristic-dashboard light-theme">
+      <IonHeader>
+        <IonToolbar className="header-toolbar">
+          <IonButtons slot="start">
+            <IonButton className="back-button" onClick={() => history.push("/")}>
+              <span className="back-text">Back</span>
+            </IonButton>
+          </IonButtons>
+          <IonTitle className="main-title">
+            <IonIcon icon={flashOutline} className="title-icon pulse-icon" />
+            PETROL STATION
+          </IonTitle>
+        </IonToolbar>
+      </IonHeader>
 
 
       <IonContent fullscreen className="dashboard-content">
@@ -413,26 +403,26 @@ const PetrolStationDashboard: React.FC = () => {
           </IonCard>
 
           <div className="stats-summary">
-  <IonChip className="stat-chip high-risk">
-    <IonIcon icon={alertCircleOutline} />
-    <IonLabel>
-      HIGH RISK: {data.filter((station) => {
-        // Ensure 'vehicles' is an array
-        if (!Array.isArray(station.vehicles)) {
-          return false; // Skip this station if vehicles is not an array
-        }
+            <IonChip className="stat-chip high-risk">
+              <IonIcon icon={alertCircleOutline} />
+              <IonLabel>
+                HIGH RISK: {data.filter((station) => {
+                  // Ensure 'vehicles' is an array
+                  if (!Array.isArray(station.vehicles)) {
+                    return false; // Skip this station if vehicles is not an array
+                  }
 
-        // Filter the unique vehicles with status 'High Potential'
-        const highPotentialVehicles = station.vehicles.filter((vehicle: Vehicle) => vehicle.status === 'High Potential');
-        
-        // Count unique vehicle registrations
-        const uniqueCount = new Set(highPotentialVehicles.map(vehicle => vehicle.no_pendaftaran_kenderaan)).size;
+                  // Filter the unique vehicles with status 'High Potential'
+                  const highPotentialVehicles = station.vehicles.filter((vehicle: Vehicle) => vehicle.status === 'High Potential');
 
-        // Check if the unique vehicle count is greater than 5
-        return uniqueCount > 5;
-      }).length}
-    </IonLabel>
-  </IonChip>
+                  // Count unique vehicle registrations
+                  const uniqueCount = new Set(highPotentialVehicles.map(vehicle => vehicle.no_pendaftaran_kenderaan)).size;
+
+                  // Check if the unique vehicle count is greater than 5
+                  return uniqueCount > 5;
+                }).length}
+              </IonLabel>
+            </IonChip>
 
 
 
@@ -482,14 +472,14 @@ const PetrolStationDashboard: React.FC = () => {
                 <IonCardHeader>
                   <IonCardTitle className="station-title">
                     <IonIcon icon={businessOutline} className="station-icon" />
-                    {station.nama_lokasi_stesen_minyak1}
+                    {station.station_name}
                   </IonCardTitle>
                   <IonCardSubtitle className="station-location">
                     <IonIcon icon={locationOutline} className="location-icon" />
-                    {station.state_2}
+                    {station.state}
                   </IonCardSubtitle>
                 </IonCardHeader>
-            
+
                 <IonCardContent className="station-content">
                   <div className="data-grid">
                     <div className="data-section">
@@ -501,7 +491,7 @@ const PetrolStationDashboard: React.FC = () => {
                         {station.total_volume.toLocaleString()} L
                       </div>
                     </div>
-            
+
                     <div className="data-section">
                       <div className="data-header">
                         <IonIcon icon={carSportOutline} className="data-icon" />
@@ -509,7 +499,7 @@ const PetrolStationDashboard: React.FC = () => {
                       </div>
                       <div className="data-value">{station.unique_vehicles}</div>
                     </div>
-            
+
                     <div className="data-section">
                       <div className="data-header">
                         <IonIcon icon={analyticsOutline} className="data-icon" />
@@ -517,7 +507,7 @@ const PetrolStationDashboard: React.FC = () => {
                       </div>
                       <div className="data-value">{station.transaction_count}</div>
                     </div>
-            
+
                     <div className="data-section">
                       <div className="data-header">
                         <IonIcon icon={pulseOutline} className="data-icon" />
@@ -529,24 +519,23 @@ const PetrolStationDashboard: React.FC = () => {
                         </IonBadge>
                       </div>
                     </div>
-            
+
                     {/* NEW: LAST ACTIVITY (Latest Transaction Time) */}
                     <div className="data-section">
                       <div className="data-header">
                         <IonIcon icon={timeOutline} className="data-icon" />
-                        <span className="data-label">LAST ACTIVITY</span>
+                        <span className="data-label">TRANSACTION</span>
                       </div>
                       <div className="data-value time-value" style={{ fontSize: "13px", marginLeft: "22px" }}>
-                        {new Date(station.fmt_datetime).toLocaleString("en-MY", {
+                        {new Date(station.day_date).toLocaleString("en-MY", {
                           month: "short",
                           day: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit",
+                          year: "numeric",
                         })}
                       </div>
                     </div>
                   </div>
-            
+
                   <IonButton
                     expand="block"
                     onClick={() => handleViewTransactions(station)}
@@ -641,7 +630,7 @@ const PetrolStationDashboard: React.FC = () => {
                       </div>
                       <div className="transaction-date">
                         <IonIcon icon={timeOutline} className="transaction-icon" />
-                        <span>{new Date(transaction.fmt_datetime).toLocaleString()}</span>
+                        <span>{new Date(transaction.formatted_date).toLocaleString()}</span>
                       </div>
                       <div className="transaction-status">
                         <IonBadge className={`transaction-badge ${getRiskBadgeColor(transaction.status)}`}>

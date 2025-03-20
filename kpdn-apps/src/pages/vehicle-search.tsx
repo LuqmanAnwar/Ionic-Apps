@@ -90,13 +90,13 @@ const VehicleSearch: React.FC = () => {
     setIsLoading(true);
     try {
       const url = "https://e74d-203-142-6-113.ngrok-free.app/api/vehicle1";
-  
+
       // Create the request body
       const requestBody = {
-        state: selectedState || "", // Send empty string if none selected
-        no_pendaftaran_kenderaan: searchText || "", // Send empty string if none entered
+        state: selectedState, // Send empty string if none selected
+        no_pendaftaran_kenderaan: searchText, // Send empty string if none entered
       };
-  
+
       const response = await fetch(url, {
         method: "POST",
         headers: {
@@ -104,25 +104,25 @@ const VehicleSearch: React.FC = () => {
         },
         body: JSON.stringify(requestBody),
       });
-  
+
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
-  
+
       const json = await response.json();
-  
+
       // Access the high potential vehicles and latest transactions
       const highPotentialVehicles = json.high_potential_vehicles || [];
       const latestTransactions = json.latest_transactions || [];
-  
+
       // Combine the data
       const combinedData = [
         ...highPotentialVehicles,
         ...latestTransactions,
       ];
-  
 
-  
+
+
       setData(combinedData);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -266,11 +266,10 @@ const VehicleSearch: React.FC = () => {
             data.map((vehicle: any) => (
               <IonCard
                 key={vehicle.no_pendaftaran_kenderaan}
-                className={`vehicle-card ${
-                  vehicle.status === "High Potential"
+                className={`vehicle-card ${vehicle.status === "High Potential"
                     ? "high-risk-card"
                     : "normal-card"
-                }`}
+                  }`}
               >
                 <div className="card-glow"></div>
                 <IonCardHeader>
@@ -280,11 +279,10 @@ const VehicleSearch: React.FC = () => {
                       {vehicle.no_pendaftaran_kenderaan}
                     </IonCardTitle>
                     <IonBadge
-                      className={`risk-badge ${
-                        vehicle.status === "High Potential"
+                      className={`risk-badge ${vehicle.status === "High Potential"
                           ? "high-risk-badge"
                           : "normal-badge"
-                      }`}
+                        }`}
                     >
                       {vehicle?.status?.toUpperCase()}
                     </IonBadge>
@@ -320,11 +318,10 @@ const VehicleSearch: React.FC = () => {
                                   vehicle.kuota_guna_liter_sum
                                 ) / 100
                               }
-                              className={`volume-progress ${
-                                vehicle.kuota_guna_liter_sum > 250
+                              className={`volume-progress ${vehicle.kuota_guna_liter_sum > 250
                                   ? "high-volume"
                                   : "normal-volume"
-                              }`}
+                                }`}
                             ></IonProgressBar>
                           </div>
                         </div>

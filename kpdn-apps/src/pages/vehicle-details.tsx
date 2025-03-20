@@ -41,10 +41,13 @@ import {
 } from "ionicons/icons";
 import { useParams } from "react-router-dom";
 import "../style/styles.css";
+import "./Home.css"
+import VehicleMap from "./vehicle-map";
+
 
 // Define interfaces for our data
 interface VehicleDetails {
-  no_pendaftaran_kenderaan: string; 
+  no_pendaftaran_kenderaan: string;
   regNumber: string;
   state_2: string; // <-- Add this line for state_2
   state: string;
@@ -91,7 +94,7 @@ interface Transaction {
 }
 
 interface Flag {
-  no_pendaftaran_kenderaan: string; 
+  no_pendaftaran_kenderaan: string;
   type: string;
   description: string;
   date: string;
@@ -158,8 +161,8 @@ const VehicleDetails: React.FC = () => {
             filteredTransactions[0].status === "High Potential"
               ? "high"
               : filteredTransactions[0].status === "Low Potential"
-              ? "medium"
-              : "low",
+                ? "medium"
+                : "low",
           owner: filteredTransactions[0].pemegang_akaun1 || "N/A",
           vehicleType: filteredTransactions[0].sektor_kenderaan1 || "N/A",
           registrationDate: filteredTransactions[0].tarikh1 || "N/A",
@@ -226,6 +229,7 @@ const VehicleDetails: React.FC = () => {
     );
   }
 
+
   if (!vehicle) {
     return (
       <IonPage className="futuristic-dashboard light-theme">
@@ -264,8 +268,21 @@ const VehicleDetails: React.FC = () => {
         </IonToolbar>
       </IonHeader>
 
+
+
       <IonContent className="dashboard-content">
         <div className="content-container">
+
+          <IonCard>
+            <div className="station-map-section">
+              <h2 className="section-title">
+                <IonIcon icon={locationOutline} className="section-icon" />
+                Petrol Station Risk Map
+              </h2>
+              <VehicleMap />
+            </div></IonCard>
+
+
           {/* Vehicle Header Card */}
           <IonCard className="vehicle-card">
             <IonCardHeader>
@@ -275,17 +292,18 @@ const VehicleDetails: React.FC = () => {
                   {vehicle.regNumber}
                 </IonCardTitle>
                 <IonBadge
-                  className={`risk-badge ${
-                    vehicle.status === "High Potential"
-                      ? "high-risk-badge"
-                      : "normal-badge"
-                  }`}
+                  className={`risk-badge ${vehicle.status === "High Potential"
+                    ? "high-risk-badge"
+                    : "normal-badge"
+                    }`}
                 >
                   {vehicle.status ? vehicle.status.toUpperCase() : "UNKNOWN"}{" "}
                   RISK
                 </IonBadge>
               </div>
             </IonCardHeader>
+
+
 
             <IonCardContent>
               <IonGrid>
@@ -368,11 +386,10 @@ const VehicleDetails: React.FC = () => {
                                 vehicle.kuota_guna_liter_sum
                               ) / 100
                             }
-                            className={`volume-progress ${
-                              vehicle.kuota_guna_liter_sum > 250
-                                ? "high-volume"
-                                : "normal-volume"
-                            }`}
+                            className={`volume-progress ${vehicle.kuota_guna_liter_sum > 250
+                              ? "high-volume"
+                              : "normal-volume"
+                              }`}
                           ></IonProgressBar>
                         </div>
                       </div>
@@ -436,7 +453,7 @@ const VehicleDetails: React.FC = () => {
             <IonCardContent>
               <IonList className="transaction-list">
                 {Array.isArray(vehicle.transactions) &&
-                vehicle.transactions.length > 0 ? (
+                  vehicle.transactions.length > 0 ? (
                   vehicle.transactions.map((transaction, index) => (
                     <IonItem key={index} className="transaction-item">
                       <IonLabel>

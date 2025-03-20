@@ -1,0 +1,163 @@
+.map-container {
+  height: 100%;
+  width: 100%;
+}
+
+.map-card {
+  position: relative;
+  margin: 16px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.map-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  font-size: 16px;
+  color: #666;
+}
+
+.filter-box {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 1000;
+  background-color: white;
+  padding: 12px 16px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(229, 231, 235, 0.8);
+  max-width: 300px;
+  /* Text rendering improvements */
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Ionic component specific fixes */
+.filter-box ion-select,
+.filter-box .select-text,
+.filter-box .select-placeholder,
+.filter-box .select-icon,
+.filter-box ion-select-option {
+  text-rendering: optimizeLegibility !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+  transform: none !important;
+  transition: none !important;
+  font-weight: 500 !important;
+  letter-spacing: normal !important;
+}
+
+/* Fix for Ionic select when open/active */
+.select-interface-option,
+ion-action-sheet,
+ion-alert,
+ion-popover {
+  --backdrop-opacity: 0 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  font-weight: 500 !important;
+  text-rendering: optimizeLegibility !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+}
+
+/* Fix for the dropdown list text */
+:root {
+  --backdrop-filter: none !important;
+  --backdrop-opacity: 1 !important;
+}
+
+/* Target Ionic's alert/action sheet/popover components */
+ion-alert,
+ion-action-sheet,
+ion-popover,
+.alert-wrapper,
+.action-sheet-container,
+.popover-content {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  --backdrop-filter: none !important;
+  filter: none !important;
+  transform: none !important;
+  text-rendering: optimizeLegibility !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+}
+
+/* Target the actual option text */
+.alert-radio-label,
+.alert-checkbox-label,
+.action-sheet-button,
+.select-interface-option,
+ion-select-option,
+.alert-tappable,
+.alert-button-inner,
+.action-sheet-button-inner {
+  text-rendering: optimizeLegibility !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+  transform: none !important;
+  transition: none !important;
+  filter: none !important;
+  font-weight: 500 !important;
+}
+
+/* Additional styling for filter box content */
+.filter-box h3 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.filter-box select,
+.filter-box input {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.filter-box button {
+  background-color: #4f46e5;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.filter-box button:hover {
+  background-color: #4338ca;
+}
+
+/* Force hardware acceleration to prevent text blur */
+.filter-box * {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Global fix for Ionic overlays */
+.ion-page {
+  contain: none !important;
+}
+
+/* Override Ionic's backdrop */
+ion-backdrop {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+

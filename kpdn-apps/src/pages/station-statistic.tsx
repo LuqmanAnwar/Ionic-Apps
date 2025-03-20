@@ -2,6 +2,7 @@
 
 import type React from "react";
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import {
   IonPage,
   IonHeader,
@@ -54,35 +55,16 @@ import { useHistory } from "react-router";
 
 // Define interfaces for our data
 interface StationStatistics {
-  address: string;
-  district: string;
-  fmt_datetime: string;
-  jenis_fleet_card1: string;
-  kategori_kenderaan: string;
-  kuota_guna_liter: number;
-  kuota_lulus_liter: number;
-  lat: number;
-  lng: number;
-  masa_transaksi: string;
-  nama_lokasi_stesen_minyak: string;
-  negeri: string;
-  no_subsidi: string;
-  no_pendaftaran_kenderaan: string;
-  pemegang_akaun1: string;
-  sektor_kenderaan1: string;
-  state_2: string;
+  formatted_date: string;
+  quota_approved: number;
+  station_name: string;
+  state: string;
   status: string;
-  transaction_count_daily: number;
-  nama_lokasi_stesen_minyak1: string;
-  petrol_car_unique: number;
-  all_petrol_transaction_count: number;
   total_volume: number;
   unique_vehicles: string;
   transaction_count: number;
-  volumeByHour: any;
-  transactionsByHour: any;
-  nama_lokasi_stesen_minyak1_id: string;
-
+  station_id: string;
+  day_date: string;
 }
 
 interface TransactionData {
@@ -95,10 +77,8 @@ interface TransactionData {
 }
 
 const StationStatistics: React.FC = () => {
-  const { nama_lokasi_stesen_minyak1_id } = useParams<{ nama_lokasi_stesen_minyak1_id: string }>();
-  const { nama_lokasi_stesen_minyak1 } = useParams<{ nama_lokasi_stesen_minyak1: string }>();
-  const [startDate, setStartDate] = useState<string | null>(null)
-  const [endDate, setEndDate] = useState<string | null>(null)
+  const { station_id } = useParams<{ station_id: string }>();
+  const { station_name } = useParams<{ station_name: string }>();
   const [statistics, setStatistics] = useState<StationStatistics | null>(null);
   const [transactions, setTransactions] = useState<TransactionData[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -106,25 +86,30 @@ const StationStatistics: React.FC = () => {
   const history = useHistory();
   const [volumeData, setVolumeData] = useState<any[]>([]); // State to hold volume data
   const [transactionData, setTransactionsByHour] = useState<any[]>([]);
+  const location = useLocation();
+  const query = new URLSearchParams(location.search);
+  const [selectedDate, setSelectedDate] = useState<string | null>(query.get('date'));
+
+
 
 
   useEffect(() => {
-    console.log("Station ID:", nama_lokasi_stesen_minyak1_id);
+    console.log("Station ID:", station_id);
+    console.log("Selected Date:", selectedDate);
 
     const fetchDataAndTransactions = async () => {
-
-      if (nama_lokasi_stesen_minyak1_id) {
+      if (station_id) {
         // Fetch station data
-        await fetchData(nama_lokasi_stesen_minyak1_id);
+        await fetchData(station_id, selectedDate || ""); // Pass selectedDate here
       }
     };
 
     fetchDataAndTransactions();
-  }, [nama_lokasi_stesen_minyak1_id]); // Only depend on station ID
+  }, [station_id, selectedDate]);// Only depend on station ID
 
   useEffect(() => {
-    if (statistics && statistics.nama_lokasi_stesen_minyak1) {
-      const stationName = statistics.nama_lokasi_stesen_minyak1;
+    if (statistics && statistics.station_id) {
+      const stationName = statistics.station_name;
       console.log("Statistic", statistics)
       console.log("Station Name:", stationName);
 
@@ -141,12 +126,13 @@ const StationStatistics: React.FC = () => {
 
 
 
-  const fetchData = async (stationName: string) => {
+  const fetchData = async (station_id: string, day_date: string) => {
     setIsLoading(true);
     try {
       const url = "https://e74d-203-142-6-113.ngrok-free.app/api/petrol2"; // Update with the correct endpoint
       const requestBody = {
-        searchid: stationName,
+        station_id: station_id,
+        day_date: day_date,
       };
 
       const response = await fetch(url, {
@@ -323,11 +309,11 @@ const StationStatistics: React.FC = () => {
             <IonCardHeader>
               <IonCardTitle className="station-title">
                 <IonIcon icon={businessOutline} className="station-icon" />
-                {statistics?.nama_lokasi_stesen_minyak1}
+                {statistics?.station_name}
               </IonCardTitle>
               <div className="station-location">
                 <IonIcon icon={locationOutline} className="location-icon" />
-                {statistics?.state_2}
+                {statistics?.state}
               </div>
             </IonCardHeader>
 
