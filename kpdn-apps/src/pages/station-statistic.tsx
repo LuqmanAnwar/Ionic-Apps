@@ -55,7 +55,7 @@ import { useHistory } from "react-router";
 
 // Define interfaces for our data
 interface StationStatistics {
-  formatted_date: string;
+  formatted_date: { $date: string };
   quota_approved: number;
   station_name: string;
   state: string;
@@ -71,7 +71,7 @@ interface TransactionData {
   id: string;
   no_vehicle_registration: string;
   volume_liter: number;
-  formatted_date: string;
+  formatted_date: { $date: string };
   status: string;
   station_name: string;
 }
@@ -478,7 +478,7 @@ const StationStatistics: React.FC = () => {
                           <IonCol size="6" className="ion-text-end">
                             <div className="transaction-time">
                               <IonIcon icon={timeOutline} className="transaction-icon" />
-                              {new Date(transaction.formatted_date).toLocaleString("en-MY", {
+                              {new Date(transaction?.formatted_date?.$date).toLocaleString("en-MY", {
                                 month: "short",
                                 day: "numeric",
                                 hour: "2-digit",

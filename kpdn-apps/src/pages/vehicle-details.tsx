@@ -48,8 +48,7 @@ import VehicleMap from "./vehicle-map";
 // Define interfaces for our data
 interface VehicleDetails {
   no_vehicle_registration: string;
-  regNumber: string;
-  state_2: string; // <-- Add this line for state_2
+  regNumber: string; // <-- Add this line for state
   state: string;
   dailyPurchase: number;
   approvedQuota: number;
@@ -61,36 +60,25 @@ interface VehicleDetails {
   registrationDate: string;
   transactions: Transaction[];
   flags: Flag[];
-  pemegang_akaun1: string; // <-- Added this property
-  sektor_kenderaan1: string;
+  account_name: string; // <-- Added this property
+  vehicle_sector: string;
   status: string;
-  kuota_guna_liter_sum: number; // <-- Added this property
+  volume_liter: number; // <-- Added this property
 }
 
 interface Transaction {
-  address: string;
-  district: string;
-  fmt_datetime: string;
-  jenis_fleet_card1: string;
+
+  formatted_date: { $date: string }; // Change Date to match API response
   kategori_kenderaan: string;
-  kuota_guna_liter: number;
+  volume_liter: number;
   kuota_lulus_liter: number;
-  lat: number;
-  lng: number;
-  masa_transaksi: string;
-  nama__lokasi_stesen_minyak: string;
-  nama_lokasi_stesen_minyak1: string;
-  negeri: string;
-  no_subsidi: string;
+  time_transaction: string;
+  station_name: string;
   no_vehicle_registration: string;
-  pemegang_akaun1: string;
-  sektor_kenderaan1: string;
-  state_2: string;
+  account_name: string;
+  vehicle_sector: string;
+  state: string;
   status: string;
-  status_df1: string;
-  status_df2: string;
-  tarikh1: string;
-  transaction_count_daily: number;
 }
 
 interface Flag {
@@ -147,33 +135,32 @@ const VehicleDetails: React.FC = () => {
         const vehicleData: VehicleDetails = {
           no_vehicle_registration: no_vehicle_registration || "", // Change this line
           regNumber: no_vehicle_registration || "",
-          state_2: filteredTransactions[0].state_2 || "N/A",
-          state: filteredTransactions[0].negeri || "N/A",
+          state: filteredTransactions[0].state || "N/A",
           dailyPurchase: filteredTransactions.reduce(
             (sum: number, transaction: Transaction) =>
-              sum + transaction.kuota_guna_liter,
+              sum + transaction.volume_liter,
             0
           ),
           approvedQuota: filteredTransactions[0].kuota_lulus_liter || 0,
           transactionCount: filteredTransactions.length,
-          lastTransaction: filteredTransactions[0].fmt_datetime || "N/A",
+          lastTransaction: filteredTransactions[0].formatted_date || "N/A",
           riskLevel:
             filteredTransactions[0].status === "High Potential"
               ? "high"
               : filteredTransactions[0].status === "Low Potential"
                 ? "medium"
                 : "low",
-          owner: filteredTransactions[0].pemegang_akaun1 || "N/A",
-          vehicleType: filteredTransactions[0].sektor_kenderaan1 || "N/A",
+          owner: filteredTransactions[0].account_name || "N/A",
+          vehicleType: filteredTransactions[0].vehicle_sector || "N/A",
           registrationDate: filteredTransactions[0].tarikh1 || "N/A",
           transactions: filteredTransactions, // Set the filtered transactions
           flags: [], // You can add flags if needed
-          pemegang_akaun1: filteredTransactions[0].pemegang_akaun1 || "N/A",
-          sektor_kenderaan1: filteredTransactions[0].sektor_kenderaan1 || "N/A",
+          account_name: filteredTransactions[0].account_name || "N/A",
+          vehicle_sector: filteredTransactions[0].vehicle_sector || "N/A",
           status: filteredTransactions[0].status || "N/A",
-          kuota_guna_liter_sum: filteredTransactions.reduce(
+          volume_liter: filteredTransactions.reduce(
             (sum: number, transaction: Transaction) =>
-              sum + transaction.kuota_guna_liter,
+              sum + transaction.volume_liter,
             0
           ),
         };
@@ -315,7 +302,7 @@ const VehicleDetails: React.FC = () => {
                         <span className="data-label">STATE</span>
                       </div>
                       <div className="data-value">
-                        {vehicle.state_2 || "N/A"}
+                        {vehicle.state || "N/A"}
                       </div>
                     </div>
                   </IonCol>
@@ -326,7 +313,7 @@ const VehicleDetails: React.FC = () => {
                         <span className="data-label">VEHICLE TYPE</span>
                       </div>
                       <div className="data-value">
-                        {vehicle.sektor_kenderaan1 || "N/A"}
+                        {vehicle.vehicle_sector || "N/A"}
                       </div>
                     </div>
                   </IonCol>
@@ -340,7 +327,7 @@ const VehicleDetails: React.FC = () => {
                         <span className="data-label">OWNER</span>
                       </div>
                       <div className="data-value">
-                        {vehicle.pemegang_akaun1 || "N/A"}
+                        {vehicle.account_name || "N/A"}
                       </div>
                     </div>
                   </IonCol>
@@ -377,16 +364,16 @@ const VehicleDetails: React.FC = () => {
                           className="data-value volume-value"
                           style={{ marginLeft: "20px" }}
                         >
-                          {vehicle.kuota_guna_liter_sum} L
+                          {vehicle.volume_liter} L
                         </div>
                         <div className="progress-container">
                           <IonProgressBar
                             value={
                               calculateVolumePercentage(
-                                vehicle.kuota_guna_liter_sum
+                                vehicle.volume_liter
                               ) / 100
                             }
-                            className={`volume-progress ${vehicle.kuota_guna_liter_sum > 250
+                            className={`volume-progress ${vehicle.volume_liter > 250
                               ? "high-volume"
                               : "normal-volume"
                               }`}
@@ -457,14 +444,16 @@ const VehicleDetails: React.FC = () => {
                   vehicle.transactions.map((transaction, index) => (
                     <IonItem key={index} className="transaction-item">
                       <IonLabel>
-                        <h3>{transaction.kuota_guna_liter} L</h3>
-                        <p>{transaction.address}</p>
+                        <h3>{transaction.volume_liter} L</h3>
+                        <p>{transaction.station_name}</p>
                         <p className="transaction-date">
-                          {new Date(transaction.fmt_datetime).toLocaleString(
+                          {new Date(transaction.formatted_date?.$date).toLocaleString(
                             "en-MY",
                             {
                               month: "short",
                               day: "numeric",
+                              year: "numeric",
+
                               hour: "2-digit",
                               minute: "2-digit",
                             }
@@ -475,9 +464,7 @@ const VehicleDetails: React.FC = () => {
                         color="medium"
                         slot="end"
                         className="station-badge"
-                      >
-                        {transaction.nama_lokasi_stesen_minyak1}
-                      </IonBadge>
+                      ></IonBadge>
                     </IonItem>
                   ))
                 ) : (
