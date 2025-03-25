@@ -69,17 +69,18 @@ interface StationStatistics {
 
 interface TransactionData {
   id: string;
-  no_pendaftaran_kenderaan: string;
-  kuota_guna_liter: number;
-  fmt_datetime: string;
+  no_vehicle_registration: string;
+  volume_liter: number;
+  formatted_date: string;
   status: string;
-  nama_lokasi_stesen_minyak1: string;
+  station_name: string;
 }
 
 const StationStatistics: React.FC = () => {
   const { station_id } = useParams<{ station_id: string }>();
   const { station_name } = useParams<{ station_name: string }>();
   const [statistics, setStatistics] = useState<StationStatistics | null>(null);
+  const [day_date, setdaydate] = useState<StationStatistics | null>(null);
   const [transactions, setTransactions] = useState<TransactionData[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isLoadingTransactions, setIsLoadingTransactions] = useState<boolean>(true);
@@ -110,17 +111,17 @@ const StationStatistics: React.FC = () => {
   useEffect(() => {
     if (statistics && statistics.station_id) {
       const stationName = statistics.station_name;
-      console.log("Statistic", statistics)
+      const day_date = statistics.day_date;
+      console.log("Statistic", statistics);
       console.log("Station Name:", stationName);
 
-      if (stationName) {
-        fetchTransactions(stationName); // Fetch transactions when statistics are updated
-        fetchVolumePerDay(stationName); // Fetch volume per day when statistics are updated
-        fetchBarPerDay(stationName); // Fetch transactions per day when statistics are updated
-
+      if (stationName && day_date) { // Ensure day_date is also checked
+        fetchTransactions(stationName, day_date); // Fetch transactions when statistics are updated
+        fetchVolumePerDay(stationName, day_date); // Pass day_date to fetchVolumePerDay
+        fetchBarPerDay(stationName, day_date); // Pass day_date to fetchBarPerDay
       }
     }
-  }, [statistics]); // Add statistics to the dependency array
+  }, [statistics, day_date]); // Add day_date to the dependency array // Add statistics to the dependency array
 
 
 
@@ -154,14 +155,15 @@ const StationStatistics: React.FC = () => {
     }
   };
 
-  const fetchTransactions = async (stationName: string) => {
+  const fetchTransactions = async (stationName: string, day_date: string) => {
     console.log("Fetching transactions for:", stationName); // Log the request body
 
     setIsLoadingTransactions(true);
     try {
       const url = "https://e74d-203-142-6-113.ngrok-free.app/api/vehicle2"; // Update with the correct endpoint
       const requestBody = {
-        station_name: stationName
+        station_name: stationName,
+        day_date: day_date,
 
       };
       console.log("Fetching transactions for:", requestBody); // Log the request body
@@ -202,11 +204,11 @@ const StationStatistics: React.FC = () => {
   };
 
 
-  const fetchVolumePerDay = async (stationName: string) => {
+  const fetchVolumePerDay = async (stationName: string, day_date: string) => {
     setIsLoading(true);
     try {
       const url = "https://e74d-203-142-6-113.ngrok-free.app/api/volume_per_day"; // Update with the correct endpoint
-      const requestBody = { station_name: stationName };
+      const requestBody = { station_name: stationName, day_date: day_date };
 
       const response = await fetch(url, {
         method: "POST",
@@ -228,11 +230,11 @@ const StationStatistics: React.FC = () => {
     }
   };
 
-  const fetchBarPerDay = async (stationName: string) => {
+  const fetchBarPerDay = async (stationName: string, day_date: string) => {
     setIsLoading(true);
     try {
-      const url = "https://e74d-203-142-6-113.ngrok-free.app/api/transactions_per_day"; // Update with the correct endpoint
-      const requestBody = { station_name: stationName };
+      const url = "https://e74d-203-142-6-113.ngrok-free.app/api/transaction_daily"; // Update with the correct endpoint
+      const requestBody = { station_name: stationName, day_date: day_date };
 
       const response = await fetch(url, {
         method: "POST",
@@ -377,8 +379,14 @@ const StationStatistics: React.FC = () => {
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={volumeData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis dataKey="date" tick={false} />
-                  <YAxis tick={{ fill: "#666666" }} />
+                  <XAxis dataKey="hours" tick={false} />
+                  <YAxis
+                    tick={{ fill: "#666666" }}
+                    domain={[
+                      Math.max(0, Math.min(...volumeData.map(d => d.total_volume)) - 10),
+                      "auto"
+                    ]}
+                  />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: "#ffffff",
@@ -393,7 +401,8 @@ const StationStatistics: React.FC = () => {
             </IonCardContent>
           </IonCard>
 
-          {/* Transactions by Hour Chart */}
+
+          {/* transaction_dailys by Hour Chart */}
           <IonCard className="chart-card">
             <IonCardHeader>
               <IonCardTitle className="chart-title">
@@ -450,7 +459,7 @@ const StationStatistics: React.FC = () => {
                           <IonCol size="6">
                             <div className="transaction-car">
                               <IonIcon icon={carSportOutline} className="transaction-icon" />
-                              <strong>{transaction.no_pendaftaran_kenderaan}</strong>
+                              <strong>{transaction.no_vehicle_registration}</strong>
                             </div>
                           </IonCol>
                           <IonCol size="6" className="ion-text-end">
@@ -463,13 +472,13 @@ const StationStatistics: React.FC = () => {
                           <IonCol size="6">
                             <div className="transaction-volume">
                               <IonIcon icon={waterOutline} className="transaction-icon" />
-                              {transaction.kuota_guna_liter} L
+                              {transaction.volume_liter} L
                             </div>
                           </IonCol>
                           <IonCol size="6" className="ion-text-end">
                             <div className="transaction-time">
                               <IonIcon icon={timeOutline} className="transaction-icon" />
-                              {new Date(transaction.fmt_datetime).toLocaleString("en-MY", {
+                              {new Date(transaction.formatted_date).toLocaleString("en-MY", {
                                 month: "short",
                                 day: "numeric",
                                 hour: "2-digit",

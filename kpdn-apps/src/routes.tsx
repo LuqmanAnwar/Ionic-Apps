@@ -17,7 +17,7 @@ const AppRoutes: React.FC = () => (
       <Route exact path="/" component={Home} />
       <Route
         exact
-        path="/vehicle/:no_pendaftaran_kenderaan"
+        path="/vehicle/:no_vehicle_registration"
         component={VehicleDetails}
       />{" "}
       <Route path="/red-flag" component={RedFlag} />

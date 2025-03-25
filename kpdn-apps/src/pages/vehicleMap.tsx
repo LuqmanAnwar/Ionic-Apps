@@ -38,7 +38,7 @@ const VehicleMap: React.FC = () => {
     useEffect(() => {
         const fetchAllStations = async () => {
             try {
-                const response = await fetch("http://localhost:5000/api/get_stations", {
+                const response = await fetch("https://e74d-203-142-6-113.ngrok-free.app/api/get_stations", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({}),

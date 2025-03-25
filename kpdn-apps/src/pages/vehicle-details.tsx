@@ -47,7 +47,7 @@ import VehicleMap from "./vehicle-map";
 
 // Define interfaces for our data
 interface VehicleDetails {
-  no_pendaftaran_kenderaan: string;
+  no_vehicle_registration: string;
   regNumber: string;
   state_2: string; // <-- Add this line for state_2
   state: string;
@@ -82,7 +82,7 @@ interface Transaction {
   nama_lokasi_stesen_minyak1: string;
   negeri: string;
   no_subsidi: string;
-  no_pendaftaran_kenderaan: string;
+  no_vehicle_registration: string;
   pemegang_akaun1: string;
   sektor_kenderaan1: string;
   state_2: string;
@@ -94,7 +94,7 @@ interface Transaction {
 }
 
 interface Flag {
-  no_pendaftaran_kenderaan: string;
+  no_vehicle_registration: string;
   type: string;
   description: string;
   date: string;
@@ -106,8 +106,8 @@ const VehicleDetails: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // Using `useParams` to get the route parameter
-  const { no_pendaftaran_kenderaan } = useParams<{
-    no_pendaftaran_kenderaan: string;
+  const { no_vehicle_registration } = useParams<{
+    no_vehicle_registration: string;
   }>();
 
   // Fetch vehicle data
@@ -117,7 +117,7 @@ const VehicleDetails: React.FC = () => {
       const url = "https://e74d-203-142-6-113.ngrok-free.app/api/vehicle2";
 
       const requestBody = {
-        no_pendaftaran_kenderaan: no_pendaftaran_kenderaan || "", // Use no_pendaftaran_kenderaan
+        no_vehicle_registration: no_vehicle_registration || "", // Use no_vehicle_registration
       };
       console.log("number of data fetch")
 
@@ -136,17 +136,17 @@ const VehicleDetails: React.FC = () => {
       const json = await response.json();
       console.log("API Response:", json); // Log the response
 
-      // Filter transactions based on no_pendaftaran_kenderaan
+      // Filter transactions based on no_vehicle_registration
       const filteredTransactions = json.filter(
         (transaction: Transaction) =>
-          transaction.no_pendaftaran_kenderaan === no_pendaftaran_kenderaan
+          transaction.no_vehicle_registration === no_vehicle_registration
       );
 
       if (filteredTransactions.length > 0) {
         // Create a vehicle object with the filtered transactions
         const vehicleData: VehicleDetails = {
-          no_pendaftaran_kenderaan: no_pendaftaran_kenderaan || "", // Change this line
-          regNumber: no_pendaftaran_kenderaan || "",
+          no_vehicle_registration: no_vehicle_registration || "", // Change this line
+          regNumber: no_vehicle_registration || "",
           state_2: filteredTransactions[0].state_2 || "N/A",
           state: filteredTransactions[0].negeri || "N/A",
           dailyPurchase: filteredTransactions.reduce(
@@ -187,10 +187,10 @@ const VehicleDetails: React.FC = () => {
     }
   };
   useEffect(() => {
-    if (no_pendaftaran_kenderaan) {
+    if (no_vehicle_registration) {
       fetchData();
     }
-  }, [no_pendaftaran_kenderaan]);
+  }, [no_vehicle_registration]);
 
   // Calculate percentage for progress bars
   const calculateVolumePercentage = (volume: number) => {
