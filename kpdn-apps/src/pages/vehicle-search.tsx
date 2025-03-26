@@ -48,14 +48,11 @@ import "../style/styles.css";
 
 // Define interfaces for our data
 interface VehicleData {
-  no_pendaftaran_kenderaan: string;
-  regNumber: string;
+  no_vehicle_registration: string;
   state: string;
-  dailyPurchase: number;
-  approvedQuota: number;
-  transactionCount: number;
-  lastTransaction: string;
-  riskLevel: "High Potential" | "medium" | "Low Potential";
+  status: "High Potential" | "medium" | "Low Potential"; // Changed from riskLevel to status
+  volume_liter: number; // Added this line
+  formatted_date: { $date: string }; // Added this line
 }
 
 const VehicleSearch: React.FC = () => {
@@ -89,13 +86,15 @@ const VehicleSearch: React.FC = () => {
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      const url = "https://e74d-203-142-6-113.ngrok-free.app/api/vehicle1";
+      const url = "https://e74d-203-142-6-113.ngrok-free.app/api/vehicle2";
 
       // Create the request body
       const requestBody = {
         state: selectedState, // Send empty string if none selected
-        no_pendaftaran_kenderaan: searchText, // Send empty string if none entered
+        no_vehicle_registration: searchText, // Send empty string if none entered
       };
+      console.log("Request Body:", requestBody); // Log request body
+
 
       const response = await fetch(url, {
         method: "POST",
@@ -111,16 +110,7 @@ const VehicleSearch: React.FC = () => {
 
       const json = await response.json();
 
-      // Access the high potential vehicles and latest transactions
-      const highPotentialVehicles = json.high_potential_vehicles || [];
-      const latestTransactions = json.latest_transactions || [];
-
-      // Combine the data
-      const combinedData = [
-        ...highPotentialVehicles,
-        ...latestTransactions,
-      ];
-
+      const combinedData = json || []; // Changed to directly use json
 
 
       setData(combinedData);
@@ -137,20 +127,20 @@ const VehicleSearch: React.FC = () => {
     }, 1000);
   };
 
-  const handleViewDetails = (no_pendaftaran_kenderaan: string) => {
-    history.push(`/vehicle/${no_pendaftaran_kenderaan}`);
+  const handleViewDetails = (no_vehicle_registration: string) => {
+    history.push(`/vehicle/${no_vehicle_registration}`);
   };
 
   const getRiskBadgeColor = (status: string) => {
     switch (status) {
       case "High Potential":
-        return "danger";
+        return "high-risk-badge";
       case "medium":
         return "warning";
-      case "Low Potential":
+      case "normal-badge":
         return "success";
       default:
-        return "medium";
+        return "normal-badge";
     }
   };
 
@@ -265,31 +255,26 @@ const VehicleSearch: React.FC = () => {
           ) : data.length > 0 ? (
             data.map((vehicle: any) => (
               <IonCard
-                key={vehicle.no_pendaftaran_kenderaan}
-                className={`vehicle-card ${vehicle.status === "High Potential"
-                    ? "high-risk-card"
-                    : "normal-card"
-                  }`}
+                key={vehicle.no_vehicle_registration}
+                className={`vehicle-card ${getRiskBadgeColor(vehicle.status)}`} // Changed to use getRiskBadgeColor
               >
                 <div className="card-glow"></div>
                 <IonCardHeader>
                   <div className="vehicle-header">
                     <IonCardTitle className="vehicle-title">
                       <IonIcon icon={carSport} className="vehicle-icon" />
-                      {vehicle.no_pendaftaran_kenderaan}
+                      {vehicle.no_vehicle_registration}
                     </IonCardTitle>
                     <IonBadge
-                      className={`risk-badge ${vehicle.status === "High Potential"
-                          ? "high-risk-badge"
-                          : "normal-badge"
-                        }`}
+                      className={`risk-badge ${getRiskBadgeColor(vehicle.status)}`} // Changed to use getRiskBadgeColor
                     >
-                      {vehicle?.status?.toUpperCase()}
+                      {console.log("Vehicle Status:", vehicle.status)} {/* Log the status */}
+                      {vehicle.status.toUpperCase()}
                     </IonBadge>
                   </div>
                   <IonCardSubtitle className="vehicle-location">
                     <IonIcon icon={locationOutline} className="location-icon" />
-                    {vehicle.state_2}
+                    {vehicle.state}
                   </IonCardSubtitle>
                 </IonCardHeader>
 
@@ -309,18 +294,18 @@ const VehicleSearch: React.FC = () => {
                             className="data-value volume-value"
                             style={{ marginLeft: "20px" }}
                           >
-                            {vehicle.kuota_guna_liter_sum} L
+                            {vehicle.volume_liter} L
                           </div>
                           <div className="progress-container">
                             <IonProgressBar
                               value={
                                 calculateVolumePercentage(
-                                  vehicle.kuota_guna_liter_sum
+                                  vehicle.volume_liter
                                 ) / 100
                               }
-                              className={`volume-progress ${vehicle.kuota_guna_liter_sum > 250
-                                  ? "high-volume"
-                                  : "normal-volume"
+                              className={`volume-progress ${vehicle.volume_liter > 250
+                                ? "high-volume"
+                                : "normal-volume"
                                 }`}
                             ></IonProgressBar>
                           </div>
@@ -346,7 +331,7 @@ const VehicleSearch: React.FC = () => {
                     </IonRow>
 
                     <IonRow>
-                      <IonCol size="6">
+                      {/* <IonCol size="6">
                         <div className="data-section">
                           <div className="data-header">
                             <IonIcon icon={analytics} className="data-icon" />
@@ -354,7 +339,7 @@ const VehicleSearch: React.FC = () => {
                           </div>
                           <div className="data-value">-</div>
                         </div>
-                      </IonCol>
+                      </IonCol> */}
                       <IonCol size="6">
                         <div className="data-section">
                           <div className="data-header">
@@ -365,11 +350,12 @@ const VehicleSearch: React.FC = () => {
                             className="data-value time-value"
                             style={{ fontSize: "13px", marginLeft: "22px" }}
                           >
-                            {new Date(vehicle.fmt_datetime).toLocaleString(
+                            {new Date(vehicle.formatted_date.$date).toLocaleString( // Removed optional chaining since formatted_date is expected to be present
                               "en-MY",
                               {
                                 month: "short",
                                 day: "numeric",
+                                year: "numeric",
                                 hour: "2-digit",
                                 minute: "2-digit",
                               }
@@ -383,7 +369,7 @@ const VehicleSearch: React.FC = () => {
                   <IonButton
                     expand="block"
                     onClick={() =>
-                      handleViewDetails(vehicle.no_pendaftaran_kenderaan)
+                      handleViewDetails(vehicle.no_vehicle_registration)
                     }
                     className="view-details-button"
                   >

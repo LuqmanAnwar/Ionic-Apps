@@ -48,7 +48,7 @@ import VehicleMap from "./vehicle-map";
 // Define interfaces for our data
 interface VehicleDetails {
   no_vehicle_registration: string;
-  regNumber: string; // <-- Add this line for state
+  regNumber: string;
   state: string;
   dailyPurchase: number;
   approvedQuota: number;
@@ -60,15 +60,15 @@ interface VehicleDetails {
   registrationDate: string;
   transactions: Transaction[];
   flags: Flag[];
-  account_name: string; // <-- Added this property
+  account_name: string;
   vehicle_sector: string;
   status: string;
-  volume_liter: number; // <-- Added this property
+  volume_liter: number;
 }
 
 interface Transaction {
 
-  formatted_date: { $date: string }; // Change Date to match API response
+  formatted_date: { $date: string };
   kategori_kenderaan: string;
   volume_liter: number;
   kuota_lulus_liter: number;

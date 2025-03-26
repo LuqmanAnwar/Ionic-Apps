@@ -11,12 +11,21 @@ interface Station {
     address: string
     district: string
     state: string
+    syarikat_id?: string
     location: {
         coordinates: [number, number] // [lng, lat]
     }
 }
 
-// Custom styles to fix blurry text
+// Map station types to display names
+const stationTypeMap = {
+    CLTX: "Caltex Station",
+    SHELL: "Shell Station",
+    PTRN: "Petron Station",
+    BHP: "BHP Station",
+}
+
+// Custom styles for select components
 const customSelectStyles = {
     "--backdrop-filter": "none",
     "--backdrop-opacity": "1",
@@ -33,59 +42,62 @@ const StationMap: React.FC = () => {
     const mapContainerRef = useRef<HTMLDivElement | null>(null)
     const [mapInstance, setMapInstance] = useState<L.Map | null>(null)
     const [stations, setStations] = useState<Station[]>([])
-    const [allStates, setAllStates] = useState<string[]>([])
+    const [allStates, setAllStates] = useState<string[]>([
+        "Johor",
+        "Kedah",
+        "Kelantan",
+        "Melaka",
+        "Negeri Sembilan",
+        "Pahang",
+        "Perak",
+        "Perlis",
+        "Pulau Pinang",
+        "Sabah",
+        "Sarawak",
+        "Selangor",
+        "Terengganu",
+        "W.P. Kuala Lumpur",
+        "W.P. Labuan",
+        "W.P. Putrajaya",
+    ]);
     const [selectedState, setSelectedState] = useState<string>("W.P. Kuala Lumpur")
+    const [selectedStationType, setSelectedStationType] = useState<string>("SHELL")
     const markersRef = useRef<L.LayerGroup | null>(null)
 
-    // Fetch all stations initially & extract unique states
+
+
+
     useEffect(() => {
+        console.log("Fetching stations for:", selectedState, "Station Type:", selectedStationType); // Debug log
         const fetchAllStations = async () => {
             try {
                 const response = await fetch("https://e74d-203-142-6-113.ngrok-free.app/api/get_stations", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({}),
-                })
+                    body: JSON.stringify({
+                        state: selectedState || "W.P. Kuala Lumpur",  // ✅ Default state
+                        syarikat_id: selectedStationType,
+                    }),
+                });
 
-                const data = await response.json()
+                const data = await response.json();
+                console.log("API Response:", data); // Debug log
+
                 if (data.status === "success") {
-                    const stationsData: Station[] = data.data
-                    const states = [...new Set(stationsData.map((station) => station.state))].sort()
-                    setAllStates(states)
+                    setStations(data.data);
                 } else {
-                    console.error("Error fetching states:", data.message)
+                    console.error("Error fetching states:", data.message);
                 }
             } catch (error) {
-                console.error("Fetch error:", error)
+                console.error("Fetch error:", error);
             }
-        }
+        };
 
-        fetchAllStations()
-    }, [])
+        fetchAllStations();
+    }, [selectedState, selectedStationType]);
+    // Re-fetch when station type changes
 
-    // Fetch station data for selected state
-    useEffect(() => {
-        const fetchStations = async () => {
-            try {
-                const response = await fetch("https://e74d-203-142-6-113.ngrok-free.app/api/get_stations", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ params: selectedState, isState: true }),
-                })
-
-                const data = await response.json()
-                if (data.status === "success") {
-                    setStations(data.data)
-                } else {
-                    console.error("Error fetching stations:", data.message)
-                }
-            } catch (error) {
-                console.error("Fetch error:", error)
-            }
-        }
-
-        if (selectedState) fetchStations()
-    }, [selectedState])
+    // Ensure this runs when selectedState changes
 
     // Initialize Leaflet Map
     useEffect(() => {
@@ -144,20 +156,23 @@ const StationMap: React.FC = () => {
 
     return (
         <IonCard className="map-card">
-            <IonCardContent style={{ height: "500px", padding: "0", position: "relative" }}>
-                <div className="filter-box">
+            {/* Filter section above the map */}
+            <div className="filters-container">
+                <div className="filter-item">
+                    <label>State</label>
                     <IonSelect
-                        value={selectedState}
+                        value={selectedState || "W.P. Kuala Lumpur"}
                         placeholder="Select State"
-                        onIonChange={(e) => setSelectedState(e.detail.value)}
-                        interface="alert" // Try using "alert" instead of default
+                        onIonChange={(e) => setSelectedState(e.detail.value || "W.P. Kuala Lumpur")}
+                        interface="alert"
                         style={customSelectStyles as any}
                         interfaceOptions={{
                             cssClass: "custom-select-alert",
                             backdropDismiss: true,
-                            translucent: false,
+                            translucent: false,  // ❌ Ensures full visibility (No blur)
                         }}
                     >
+
                         {allStates.map((state, index) => (
                             <IonSelectOption
                                 key={index}
@@ -174,6 +189,38 @@ const StationMap: React.FC = () => {
                     </IonSelect>
                 </div>
 
+                <div className="filter-item">
+                    <label>Station Type</label>
+                    <IonSelect
+                        value={selectedStationType}
+                        placeholder="Select Station Type"
+                        onIonChange={(e) => setSelectedStationType(e.detail.value)}
+                        interface="alert"
+                        style={customSelectStyles as any}
+                        interfaceOptions={{
+                            cssClass: "custom-select-alert",
+                            backdropDismiss: true,
+                            translucent: false,
+                        }}
+                    >
+                        {Object.entries(stationTypeMap).map(([code, name]) => (
+                            <IonSelectOption
+                                key={code}
+                                value={code}
+                                style={{
+                                    fontWeight: "500",
+                                    fontSize: "14px",
+                                    padding: "10px",
+                                }}
+                            >
+                                {name}
+                            </IonSelectOption>
+                        ))}
+                    </IonSelect>
+                </div>
+            </div>
+
+            <IonCardContent style={{ height: "500px", padding: "0", position: "relative" }}>
                 <div ref={mapContainerRef} className="map-container" style={{ height: "100%", width: "100%" }}></div>
             </IonCardContent>
         </IonCard>
