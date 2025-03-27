@@ -131,7 +131,7 @@ const PetrolStationDashboard: React.FC = () => {
   const formatDateForBackend = (dateString: string | null) => {
     if (!dateString) return null
     const date = new Date(dateString)
-    return date// Format as 'YYYY-MM-DD'
+    return date.toISOString().split("T")[0]  // ✅ Ensures 'YYYY-MM-DD'
   }
 
   const fetchData = useCallback(async () => {
@@ -245,7 +245,7 @@ const PetrolStationDashboard: React.FC = () => {
   const formatDate = (dateString: string | null) => {
     if (!dateString) return ""
     const date = new Date(dateString)
-    return date.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })
+    return date.toLocaleDateString("en-MY", { day: "2-digit", month: "short", year: "numeric" })
   }
 
   const handleDateChange =
@@ -366,6 +366,9 @@ const PetrolStationDashboard: React.FC = () => {
                       value={startDate}
                       onIonChange={handleDateChange(setStartDate, () => setShowStartDatePicker(false))}
                       presentation="date"
+                      preferWheel={true} // Enables a more user-friendly selection
+                      showDefaultButtons={true}
+                      className="custom-datetime"
                     />
                   </IonPopover>
                 </IonItem>
@@ -384,6 +387,9 @@ const PetrolStationDashboard: React.FC = () => {
                       value={endDate}
                       onIonChange={handleDateChange(setEndDate, () => setShowEndDatePicker(false))}
                       presentation="date"
+                      preferWheel={true} // Enables a more user-friendly selection
+                      showDefaultButtons={true}
+                      className="custom-datetime"
                     />
                   </IonPopover>
                 </IonItem>

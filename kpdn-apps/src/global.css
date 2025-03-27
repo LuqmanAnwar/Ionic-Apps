@@ -98,9 +98,27 @@ ion-alert,
 
 /* 🔹 Ensure radio button text is sharp */
 .alert-radio-group,
+
 .alert-radio-label {
   font-weight: 500 !important;
   filter: none !important;
   transform: none !important;
+}
+.custom-datetime {
+  font-size: 10px; /* Adjust for readability */
+  --wheel-item-font-size: 6px; /* Reduce text size inside picker */
+  --width: 100%;
+  --max-width: 480px; /* Increase width */
+  --height: auto;
+  text-align: center;
+}
+
+.date-popover {
+  --max-width: 480px; /* Increase the width */
+  --width: 350px;
+  --height: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
