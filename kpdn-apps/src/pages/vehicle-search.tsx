@@ -51,7 +51,7 @@ interface VehicleData {
   no_vehicle_registration: string;
   state: string;
   status: "High Potential" | "medium" | "Low Potential"; // Changed from riskLevel to status
-  volume_liter: number; // Added this line
+  total_volume: number; // Added this line
   formatted_date: { $date: string }; // Added this line
 }
 
@@ -86,7 +86,7 @@ const VehicleSearch: React.FC = () => {
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      const url = "https://e74d-203-142-6-113.ngrok-free.app/api/vehicle2";
+      const url = "https://e74d-203-142-6-113.ngrok-free.app/api/vehicle1";
 
       // Create the request body
       const requestBody = {
@@ -294,16 +294,16 @@ const VehicleSearch: React.FC = () => {
                             className="data-value volume-value"
                             style={{ marginLeft: "20px" }}
                           >
-                            {vehicle.volume_liter} L
+                            {vehicle.total_volume} L
                           </div>
                           <div className="progress-container">
                             <IonProgressBar
                               value={
                                 calculateVolumePercentage(
-                                  vehicle.volume_liter
+                                  vehicle.total_volume
                                 ) / 100
                               }
-                              className={`volume-progress ${vehicle.volume_liter > 250
+                              className={`volume-progress ${vehicle.total_volume > 250
                                 ? "high-volume"
                                 : "normal-volume"
                                 }`}
@@ -350,14 +350,12 @@ const VehicleSearch: React.FC = () => {
                             className="data-value time-value"
                             style={{ fontSize: "13px", marginLeft: "22px" }}
                           >
-                            {new Date(vehicle.formatted_date.$date).toLocaleString( // Removed optional chaining since formatted_date is expected to be present
+                            {new Date(vehicle.day_date).toLocaleString(
                               "en-MY",
                               {
                                 month: "short",
                                 day: "numeric",
                                 year: "numeric",
-                                hour: "2-digit",
-                                minute: "2-digit",
                               }
                             )}
                           </div>

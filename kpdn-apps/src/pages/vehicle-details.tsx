@@ -48,7 +48,7 @@ import VehicleMap from "./vehicle-map";
 // Define interfaces for our data
 interface VehicleDetails {
   no_vehicle_registration: string;
-  regNumber: string;
+  regNumber: string; // <-- Add this line for state
   state: string;
   dailyPurchase: number;
   approvedQuota: number;

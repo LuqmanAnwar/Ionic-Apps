@@ -41,10 +41,10 @@ const Home: React.FC = () => {
 
   // Mock data for dashboard summary
   const summaryData = {
-    highRiskVehicles: 28,
-    highRiskStations: 12,
-    totalTransactions: 1458,
-    totalVolume: 125840,
+    highRiskVehicles: 913,
+    highRiskStations: 45,
+    numberOfStation: 3675,
+    numberOfVehicle: 211395,
   }
 
   return (
@@ -103,6 +103,34 @@ const Home: React.FC = () => {
                     <div className="summary-details">
                       <h3 className="summary-value">{summaryData.highRiskStations}</h3>
                       <p className="summary-label">High Risk Stations</p>
+                    </div>
+                  </IonCardContent>
+                </IonCard>
+              </IonCol>
+
+              <IonCol size="6" sizeMd="3">
+                <IonCard className="summary-card">
+                  <IonCardContent className="summary-content">
+                    <div className="summary-icon-container primary">
+                      <IonIcon icon={businessOutline} className="summary-icon" />
+                    </div>
+                    <div className="summary-details">
+                      <h3 className="summary-value">{summaryData.numberOfStation}</h3>
+                      <p className="summary-label">Total Stations</p>
+                    </div>
+                  </IonCardContent>
+                </IonCard>
+              </IonCol>
+
+              <IonCol size="6" sizeMd="3">
+                <IonCard className="summary-card">
+                  <IonCardContent className="summary-content">
+                    <div className="summary-icon-container success">
+                      <IonIcon icon={carSportOutline} className="summary-icon" />
+                    </div>
+                    <div className="summary-details">
+                      <h3 className="summary-value">{summaryData.numberOfVehicle}</h3>
+                      <p className="summary-label">Total Vehicles</p>
                     </div>
                   </IonCardContent>
                 </IonCard>
