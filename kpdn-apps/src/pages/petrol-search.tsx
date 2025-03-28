@@ -174,39 +174,6 @@ const PetrolStationDashboard: React.FC = () => {
     fetchData()
   }, [fetchData, searchText, searchId])
 
-  const fetchTransactions = async (stationId: string) => {
-    setIsLoadingTransactions(true)
-    try {
-      const url = `https://e74d-203-142-6-113.ngrok-free.app/api/transactions/${stationId}`
-
-      const requestBody = {
-        state: selectedState,
-        search: searchText,
-        searchid: station_id,
-        start_date: formatDateForBackend(startDate),
-        end_date: formatDateForBackend(endDate),
-      }
-
-      console.log("Fetching transactions with:", requestBody)
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(requestBody),
-      })
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-      const json: TransactionData[] = await response.json()
-      setTransactions(json)
-    } catch (error) {
-      console.error("Error fetching transactions:", error)
-    } finally {
-      setIsLoadingTransactions(false)
-    }
-  }
 
   const handleRefresh = (event: CustomEvent) => {
     setTimeout(() => {
@@ -604,13 +571,7 @@ const PetrolStationDashboard: React.FC = () => {
                   </IonButton>
                 </IonItem>
 
-                <IonButton
-                  size="small"
-                  onClick={() => fetchTransactions(selectedStation)}
-                  className="apply-filter-button"
-                >
-                  Apply
-                </IonButton>
+
               </div>
             </div>
 

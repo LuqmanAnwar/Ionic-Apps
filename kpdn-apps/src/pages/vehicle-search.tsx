@@ -52,6 +52,7 @@ interface VehicleData {
   status: "High Potential" | "medium" | "Low Potential" // Changed from riskLevel to status
   total_volume: number // Added this line
   formatted_date: { $date: string } // Added this line
+  month: string;
 }
 
 const VehicleSearch: React.FC = () => {
@@ -130,9 +131,10 @@ const VehicleSearch: React.FC = () => {
     }, 1000)
   }
 
-  const handleViewDetails = (no_vehicle_registration: string) => {
-    history.push(`/vehicle/${no_vehicle_registration}`)
-  }
+  const handleViewDetails = (noVehicleRegistration: string, month: string) => {
+    history.push(`/vehicle/${noVehicleRegistration}?month=${month}`);
+  };
+
 
   const getRiskBadgeColor = (status: string) => {
     switch (status) {
@@ -344,7 +346,7 @@ const VehicleSearch: React.FC = () => {
 
                   <IonButton
                     expand="block"
-                    onClick={() => handleViewDetails(vehicle.no_vehicle_registration)}
+                    onClick={() => handleViewDetails(vehicle.no_vehicle_registration, vehicle.month)}
                     className="view-details-button"
                   >
                     View Details

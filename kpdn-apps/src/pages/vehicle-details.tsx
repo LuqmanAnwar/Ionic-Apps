@@ -64,6 +64,9 @@ interface VehicleDetails {
   vehicle_sector: string;
   status: string;
   volume_liter: number;
+  quota_accept: number;
+
+
 }
 
 interface Transaction {
@@ -92,11 +95,9 @@ interface Flag {
 const VehicleDetails: React.FC = () => {
   const [vehicle, setVehicle] = useState<VehicleDetails | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-
-  // Using `useParams` to get the route parameter
-  const { no_vehicle_registration } = useParams<{
-    no_vehicle_registration: string;
-  }>();
+  const params = new URLSearchParams(location.search);
+  const month = params.get("month"); // Get month from URL
+  const { no_vehicle_registration } = useParams<{ no_vehicle_registration: string, }>();
 
   // Fetch vehicle data
   const fetchData = async () => {
@@ -105,9 +106,12 @@ const VehicleDetails: React.FC = () => {
       const url = "https://e74d-203-142-6-113.ngrok-free.app/api/vehicle2";
 
       const requestBody = {
-        no_vehicle_registration: no_vehicle_registration || "", // Use no_vehicle_registration
+        no_vehicle_registration: no_vehicle_registration || "",
+        month: month || "",
+
       };
       console.log("number of data fetch")
+      console.log("Params Fetch", requestBody)
 
       const response = await fetch(url, {
         method: "POST",
@@ -142,6 +146,7 @@ const VehicleDetails: React.FC = () => {
             0
           ),
           approvedQuota: filteredTransactions[0].kuota_lulus_liter || 0,
+          quota_accept: filteredTransactions[0].quota_accept || 0, // ✅ Fix: Add quota_accept
           transactionCount: filteredTransactions.length,
           lastTransaction: filteredTransactions[0].formatted_date || "N/A",
           riskLevel:
@@ -180,9 +185,8 @@ const VehicleDetails: React.FC = () => {
   }, [no_vehicle_registration]);
 
   // Calculate percentage for progress bars
-  const calculateVolumePercentage = (volume: number) => {
-    const maxVolume = 250; // Assuming this is the max approved quota
-    return Math.min((volume / maxVolume) * 100, 100);
+  const calculateVolumePercentage = (volume: number, quota_accept: number) => {
+    return Math.min((volume / quota_accept) * 100, 100);
   };
 
   if (isLoading) {
@@ -369,9 +373,7 @@ const VehicleDetails: React.FC = () => {
                         <div className="progress-container">
                           <IonProgressBar
                             value={
-                              calculateVolumePercentage(
-                                vehicle.volume_liter
-                              ) / 100
+                              calculateVolumePercentage(vehicle.volume_liter, vehicle.quota_accept) / 100
                             }
                             className={`volume-progress ${vehicle.volume_liter > 250
                               ? "high-volume"
@@ -399,7 +401,7 @@ const VehicleDetails: React.FC = () => {
                           className="data-value"
                           style={{ marginLeft: "25px" }}
                         >
-                          250 L
+                          {vehicle?.quota_accept ? `${vehicle.quota_accept} L` : "N/A"}
                         </div>
                       </div>
                     </IonCol>
